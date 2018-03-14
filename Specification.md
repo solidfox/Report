@@ -19,22 +19,26 @@ The team at Evry has a highly invested architecture leveraging unusually high mo
 
 The objective is to devise and thus prove the existence of an architecture that fulfills the following requirements:
 
-1. An app has a single state that is atomically updated at only one point in the code.
-2. An app has a single point in the code where side-effects are performed.
-3. An app is composed of modules consisting of pure functions and values that can describe their state, state-transitions, user interface and side-effects.
+1. Applications have a single state that is atomically updated at only one point in the code.
+2. Applications have a single point in the code where side-effects are performed.
+3. Applications are composed of modules consisting of pure functions and values that can describe their state, state-transitions, user interface and side-effects.
 4. Modules can be rich enough to make sense as independent apps.
 5. Modules can be kept in independent repositories.
 6. Modules can be nested within other modules.
-7. Consumers of a module must not have any knowledge of its inner workings and a module must have complete control over its API.
-8. A child-module must have no knowledge about its parent.
-9. There is opportunity for optimizing performance by not re-rendering module subtrees where the input data is unchanged.
-10. There is opportunity to maintain the application state when redefining functionality during development. (Also known as “hot reload”.)
+7. A parent of a module must not have any knowledge of the module’s inner workings and the module must have complete control over its API.
+8. A module must have no knowledge about its parent.
+
+Furthermore it is desired but not vital that the architecture also fulfills the following criteria:
+
+1. There is opportunity for optimizing performance by not re-rendering module subtrees where the input data is unchanged.
+2. There is opportunity to maintain the application state when redefining functionality during development. (Also known as “hot reload”.)
+3. There is opportunity for a module to declare a protocol for its side-effects that enables performance optimizations through, for example, standardized caching.
 
 ## Scientific question
 
 The question will be along the lines of “Is a single point of mutation, purely functional architecture viable for large-scale, real-world reactive applications with demanding modularity constraints?”
 
-The challenge lies in restricting modules to pure functions on immutable data while still allowing them to be stateful in the application context. Modules also need to be nestable and any parent module may want to perform modifications to its state in response to events in child-modules. There are also many situations where interaction between sibling modules is necessary. This can be in the form of a bank-transactions module being able to provide details on an account selected in an accounts module or a cache module providing cached access to a network resource that several modules want to poll.  This also raises the issue of handling side-effects and the asynchrony that they give rise to. The actions in Flux can be considered synchronous since their alterations happen on the state that generated them. With side-effects like network requests that may take minutes before they call back the state that the callback will be operating on will usually be quite different from the state that generated the side-effect. This complicates things quite a bit.
+The challenge lies in restricting modules to pure functions on immutable data while still allowing them to be stateful in the application context. Modules also need to be nestable and any parent module may want to perform modifications to its state in response to events in child-modules. There are also many situations where interaction between sibling modules is necessary. This can be in the form of a bank-transactions module being able to provide details on an account selected in an accounts module or a cache module providing cached access to a network resource that several modules want access to.  This also raises the issue of handling side-effects and the asynchrony that they give rise to. The actions in Flux can be considered synchronous since their alterations happen on the state that generated them. With side-effects like network requests that may take minutes before they call back the state that the callback will be operating on will usually be quite different from the state that generated the side-effect. This complicates things quite a bit.
 
 ## Method
 
