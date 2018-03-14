@@ -2,7 +2,7 @@
 
 > A single-state architecture for industry-scale, highly modularised, pure-function front-end applications
 
-2018-03-12  
+2018-03-14  
 Daniel Schlaug - dschlaug@kth.se  
 Supervisor EECS - Philipp Haller  
 Supervisors Evry - Tomas Ekholm & Lucas Wiener
