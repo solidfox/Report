@@ -20,7 +20,11 @@ This chapter will first give a background to the Functional and Objective progra
 
 ## 2.1. Functional programming ##
 
-Functional programming is an alternative to the object oriented programmin (OOP) and imperative programming styles that are most common today. Whereas OOP couples data to the methods or functions that work on it, functional programming keeps data and functions separated. Imperative programming progressively builds up a result by mutating data into the desired form. Functional programming composes and combines functions into more specific ones that directly transforms data into the desired result. 
+Functional programming is an alternative to the object oriented programming (OOP) and imperative programming styles that are most common today. 
+
+Whereas OOP couples data to the methods or functions that work on it, functional programming decouples functions and data. To an OOP developer used to modeling their apps as heavily encapsulated objects this may sound insanse but consider the average class definition, it first defines the initial state, then how it may be changed through its methods. A lot of functional programs do the same thing, defining an initial state and the functions that change it in one file. The big difference is that there's no concept of `this` or `self`, only input parameters and return values. Turns out this context-less setting is much easier to reason about in the long run.
+
+Imperative programming progressively builds up a result by mutating data into the desired form. Functional programming composes and combines functions into more specific ones that directly transforms data into the desired result without ever conceptually mutatating anything. Since computers are imperative machines, intermediate states and mutation will off course be used in the background but never needs to reach the domain that the developer has to reason about.
 
 The example below shows the same functionality being implemented, first in highly imperative OOP and then in a functional style. There are a few things to note in
 
@@ -75,10 +79,11 @@ function receiveHttpResponse(state, httpResponse) {
 ```
 
 ```clojure
-(defn create-initial-state [] 
+; Another functional example with Clojure syntax
+(defn create-initial-state []
     {:fetching true})
 
-(defn get-file-extension [file] 
+(defn get-file-extension [file]
     (last (split (:name file) '.')))
 
 (defn is-image [file] 
