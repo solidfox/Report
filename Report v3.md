@@ -177,6 +177,42 @@ Figure 1:
 
 *Naïve: Let modules be self contained and provide implementations for their services. Better: Assume a module knows nothing about its runtime environment and thus has no idea about how to perform services. This main*
 
+## Event handling
+
+Event handling is what happens when an event occurs, an event may be the user interacting with the app in some way or a network request comming in on a web-socket. The typical response to an event is some kind of state change, the app must therefore provide 
+
+We had X requirements on the event handling in remodular:
+
+1. Event handling must be pure, thus an event may not by itself trigger side-effects.
+1. It must be possible for a parent module to intercept and alter events from child modules.
+1. The event handling runtime should not be stateful. There should be no framework-related state saying which modules are listening to which events (as is common in FRP and the observable pattern).
+
+The event handling in remodular is simple and data-driven. As some UI or service of the app is being rendered a list of functions that we call the event handling chain is built and passed down to child-modules as a part of their module context. Also contained in the module context is a function that may be called with the event handler chain and an event to request that the engine process the event and perform any actions that result from the event handler chain. 
+
+### An event
+
+An event is simply a map containing the name of the event, e.g. "name field changed", some event-specific data, e.g. {newValue: "Dani"}, and some additional data needed by the runtime, including the state path of the child that triggered the event and any actions that that child requested in response to the event.
+
+```js
+// An example of an event
+{
+    name: "name field changed",
+    data: {newValue: "Dani"},
+    statePath: ["modules" "user-profile"],
+    actions: [List of actions],
+}
+```
+
+### The Event Handler Chain
+
+The event handler chain enables each module to act on any event triggered by any of that module's children. In practice it is just a list where every module gets to add a function that processes an event and determines what actions should be performed on the module's state and if the event should "bubble" to the parent module. In addition to the event the handler function also gets the state and context of the module so that the resulting actions may depend on state. One might, for example, want to bubble a keypress only if it had no effect on the own module.
+
+There are quite a few mistakes that can be made in producing this chain. The naïve approach may be to observe that this is really just a stack of functions and we could do away with the need for the event handler chain by simply passing a function that closures over the own module's event handler and passes the result to the parent. Doing this, however, will produce inefficient results for two reasons. First, because the function will have to be an anonymous function it will be recreated on every render, producing new props to all modules and making us unable to not re-render those modules that had no other changes made to their props. Second, even if one would add logic to ignore this triggerEvent function when deciding if props have changed the function would still also have closured over the rest of the input to the module and all of its parents. This enormous amount of hidden state would not get updated and become a source of very infrequent and difficult bugs as the state used for event handling started becomming unreliable.
+
+### A note on security 
+
+One may imagine an app using dynamic modules, not unlike the apps on our smartphones, that may be downloaded and executed at runtime. In this kind of setting it might be too naïve to trust child-modules not to alter the event handler chain to steal data from parent modules. One way to resolve such a concern would be to give each module a keypair with which they may sign their actions. This would allow the engine to check that a state change is actually requested by the module that owns that state and not one of its children.
+
 # 5. Case Study #
 
 # 6. Discussion and Conclusions #
